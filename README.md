@@ -91,3 +91,28 @@ Each should return `{"service": "<name>", "status": "ok"}`.
 | Inter-service messaging | Redis Streams |
 | Database | PostgreSQL |
 | Containerization | Docker / Docker Compose |
+
+## Current Progress
+
+### ✅ Completed
+
+- Project architecture
+- Dockerized microservices
+- FastAPI API Gateway
+- PostgreSQL setup
+- Redis setup
+- Flutter project skeleton
+- Flutter ↔ Backend connectivity
+- Health monitoring endpoints
+
+### 🚧 In Progress
+
+- Flutter UI
+
+### 📅 Planned
+
+- Authentication
+- Speech-to-Text
+- Translation
+- Text-to-Speech
+- Real-time audio streaming
