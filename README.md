@@ -68,12 +68,18 @@ AI-Interpreter/
 
 Each should return `{"service": "<name>", "status": "ok"}`.
 
-## Build Status
+# 🚀 Project Status
 
-This project is being built in phases. Completed: **Phase 1 - System
-Architecture and Project Setup**, **Phase 2 - Flutter Application (Project
-Skeleton)**. See `docs/phase-notes/` for what's been built so far and
-what's next.
+| Phase | Status |
+|-------|--------|
+| Phase 1 – System Architecture & Backend Connectivity | ✅ Completed |
+| Phase 2 – Flutter Project Skeleton | ✅ Completed |
+| Phase 3 – Flutter User Interface | ⏳ Planned |
+| Phase 4 – Authentication | ⏳ Planned |
+| Phase 5 – Speech-to-Text | ⏳ Planned |
+| Phase 6 – Translation | ⏳ Planned |
+| Phase 7 – Text-to-Speech | ⏳ Planned |
+| Phase 8 – Real-Time Calling | ⏳ Planned |
 
 ## Tech Stack
 
