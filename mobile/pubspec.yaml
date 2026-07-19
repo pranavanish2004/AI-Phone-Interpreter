@@ -1,0 +1,60 @@
+name: ai_interpreter
+description: >
+  AI Phone Interpreter - real-time voice call app with meaning-preserving
+  translation between Telugu, Hindi, English, Tenglish, and Hinglish.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ---------- State management ----------
+  # Riverpod chosen over Provider/BLoC: compile-time safety, first-class
+  # support for modeling streams as state (needed for live captions/call
+  # status later), and testable without a widget tree.
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # ---------- Routing ----------
+  # go_router gives us declarative, deep-linkable routes and a clean way to
+  # guard routes (e.g. redirect to /login if not authenticated) - we'll wire
+  # that guard in this phase.
+  go_router: ^14.2.7
+
+  # ---------- Networking ----------
+  dio: ^5.7.0                # REST calls to api_gateway
+  web_socket_channel: ^3.0.1 # WebSocket for signaling/captions (Phase 5+)
+
+  # ---------- Local persistence ----------
+  # flutter_secure_storage for JWT tokens (Phase 4) - never store auth
+  # tokens in plain SharedPreferences.
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2  # non-sensitive settings, e.g. last-used language
+
+  # ---------- Utilities ----------
+  freezed_annotation: ^2.4.4  # immutable data classes for entities/models
+  json_annotation: ^4.9.0
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # ---------- Code generation ----------
+  build_runner: ^2.4.13
+  riverpod_generator: ^2.4.3
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+
+  # ---------- Testing ----------
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

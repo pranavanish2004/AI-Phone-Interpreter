@@ -1,0 +1,22 @@
+include: package:flutter_lints/flutter.yaml
+
+# Why we tighten a few rules beyond the default flutter_lints set:
+# This app will have multiple engineers (or future-you, months later)
+# touching async streaming code (audio, WebSocket, translation events)
+# where subtle bugs like unawaited futures or missing null checks are
+# expensive to debug in a live call. A few extra strict lints catch these
+# at write-time instead of at 2am during a demo.
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_print                 # use a real logger, added in a later phase
+    - cancel_subscriptions        # critical: this app has many Streams (audio, WS)
+    - close_sinks
+    - unawaited_futures
+    - prefer_const_constructors
+    - prefer_final_locals
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"      # generated code (json_serializable)
+    - "**/*.freezed.dart" # generated code (freezed)

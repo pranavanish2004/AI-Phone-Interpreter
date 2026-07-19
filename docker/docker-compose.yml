@@ -1,0 +1,192 @@
+# ==============================================================================
+# AI Phone Interpreter - Local Development Compose File (Phase 1)
+#
+# Run from the project root with:
+#   docker compose -f docker/docker-compose.yml --env-file .env up --build
+#
+# Design notes:
+#   - `depends_on` + `condition: service_healthy` ensures services don't
+#     start racing against a Postgres/Redis that isn't ready yet - a very
+#     common source of flaky "works on restart" bugs in compose setups.
+#   - All backend services share one Docker network (`interpreter_net`,
+#     created implicitly by compose) so they can reach each other by
+#     service name, e.g. http://speech_service:8002/health.
+#   - Build context is the PROJECT ROOT (../), not each service folder, so
+#     each Dockerfile can COPY backend/shared - a service-local build
+#     context couldn't see the sibling shared/ folder.
+# ==============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: interpreter_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-interpreter}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-interpreter_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-interpreter_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Anything in database/init/ is auto-executed (alphabetically) by the
+      # official Postgres image on first container start ONLY - i.e. schema.sql
+      # runs once to bootstrap tables; subsequent schema changes go through
+      # Alembic migrations (database/migrations/), not this folder.
+      - ../database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-interpreter}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - interpreter_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: interpreter_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - interpreter_net
+
+  api_gateway:
+    build:
+      context: ..
+      dockerfile: backend/api_gateway/Dockerfile
+    container_name: interpreter_api_gateway
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-interpreter}:${POSTGRES_PASSWORD:-interpreter_dev_password}@postgres:5432/${POSTGRES_DB:-interpreter_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  audio_service:
+    build:
+      context: ..
+      dockerfile: backend/audio_service/Dockerfile
+    container_name: interpreter_audio_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8001:8001"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  speech_service:
+    build:
+      context: ..
+      dockerfile: backend/speech_service/Dockerfile
+    container_name: interpreter_speech_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8002:8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  language_service:
+    build:
+      context: ..
+      dockerfile: backend/language_service/Dockerfile
+    container_name: interpreter_language_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8003:8003"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  translation_service:
+    build:
+      context: ..
+      dockerfile: backend/translation_service/Dockerfile
+    container_name: interpreter_translation_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8004:8004"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  tts_service:
+    build:
+      context: ..
+      dockerfile: backend/tts_service/Dockerfile
+    container_name: interpreter_tts_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8005:8005"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+  conversation_service:
+    build:
+      context: ..
+      dockerfile: backend/conversation_service/Dockerfile
+    container_name: interpreter_conversation_service
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-interpreter}:${POSTGRES_PASSWORD:-interpreter_dev_password}@postgres:5432/${POSTGRES_DB:-interpreter_db}
+    ports:
+      - "8006:8006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - interpreter_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  interpreter_net:
+    driver: bridge

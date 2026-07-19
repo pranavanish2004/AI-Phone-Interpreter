@@ -1,0 +1,43 @@
+# ---------- Secrets ----------
+.env
+*.env.local
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# ---------- Flutter / Dart ----------
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/build/
+mobile/**/generated_plugin_registrant.dart
+mobile/*.iml
+mobile/android/.gradle/
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+
+# ---------- Docker ----------
+docker/**/*.log
+
+# ---------- Databases ----------
+*.sqlite3
+postgres_data/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
