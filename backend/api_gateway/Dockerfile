@@ -1,4 +1,5 @@
-# api_gateway - Phase 1 skeleton Dockerfile
+# api_gateway Dockerfile
+# Installs FastAPI + DB (SQLAlchemy/asyncpg, added Phase 3) + shared package deps.
 FROM python:3.12-slim
 
 WORKDIR /app

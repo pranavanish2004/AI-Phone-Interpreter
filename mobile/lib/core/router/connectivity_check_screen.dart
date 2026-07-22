@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ai_interpreter/core/di/connectivity_check_provider.dart';
 import 'package:ai_interpreter/core/error/failures.dart';
-import 'package:ai_interpreter/services/health_check_service.dart';
 
 /// Phase 2's entry screen.
 ///

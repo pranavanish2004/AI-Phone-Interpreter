@@ -6,7 +6,7 @@ import 'package:ai_interpreter/core/error/failures.dart';
 import 'package:ai_interpreter/core/utils/result.dart';
 
 /// Result payload of a successful health check against api_gateway.
- class BackendHealth{
+class BackendHealth {
   const BackendHealth({required this.service, required this.status});
 
   final String service;
@@ -39,7 +39,7 @@ class HealthCheckService {
     } on DioException catch (e) {
       return Result.failure(_mapDioError(e));
     } catch (_) {
-      return Result.failure(const UnknownFailure());
+      return const Result.failure(UnknownFailure());
     }
   }
 

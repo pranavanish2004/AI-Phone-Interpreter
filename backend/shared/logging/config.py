@@ -20,6 +20,22 @@ from datetime import datetime, timezone
 class JSONFormatter(logging.Formatter):
     """Renders each log record as a single-line JSON object."""
 
+    # Standard attributes every LogRecord has, regardless of what the caller
+    # passed via `extra={...}`. Anything on the record NOT in this set is
+    # something a caller deliberately attached (call_id, request_id,
+    # duration_ms, etc.) and should be surfaced in the JSON output.
+    #
+    # Why a denylist instead of Phase 1's original fixed whitelist
+    # (call_id/utterance_id/user_id/stage): Phase 3 introduced request_id,
+    # duration_ms, status_code, path, method - and every future phase will
+    # want its own correlation fields (e.g. Phase 8's speech_service might
+    # want model_name, audio_duration_ms). Hardcoding each one here would
+    # mean editing shared code every single phase. A denylist of Python's
+    # own built-in LogRecord attributes is stable and never needs to change.
+    _RESERVED_ATTRS = frozenset(logging.LogRecord(
+        "", 0, "", 0, "", (), None
+    ).__dict__.keys()) | {"service_name", "message", "asctime"}
+
     def format(self, record: logging.LogRecord) -> str:
         log_obj = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -28,17 +44,15 @@ class JSONFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
         }
-        # Allow call_id/utterance_id/etc to be attached via `extra={...}`
-        # in individual log calls, e.g.:
-        #   logger.info("chunk received", extra={"call_id": "call_123"})
-        for key in ("call_id", "utterance_id", "user_id", "stage"):
-            if hasattr(record, key):
-                log_obj[key] = getattr(record, key)
+
+        for key, value in record.__dict__.items():
+            if key not in self._RESERVED_ATTRS:
+                log_obj[key] = value
 
         if record.exc_info:
             log_obj["exception"] = self.formatException(record.exc_info)
 
-        return json.dumps(log_obj)
+        return json.dumps(log_obj, default=str)
 
 
 def configure_logging(service_name: str, level: int = logging.INFO) -> None:

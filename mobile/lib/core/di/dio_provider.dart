@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ai_interpreter/core/config/app_config.dart';
+import 'package:ai_interpreter/features/auth/data/token_storage_service.dart';
 
 /// Provides a single, app-wide configured [Dio] instance.
 ///
@@ -36,10 +37,22 @@ final dioProvider = Provider<Dio>((ref) {
     );
   }
 
-  // NOTE: an auth-token-attachment interceptor (reading the JWT from
-  // flutter_secure_storage and setting the Authorization header) is added
-  // in Phase 4, once the auth feature actually issues tokens. Left as an
-  // explicit placeholder here rather than guessed at now.
+  // Attaches the JWT access token (if one is stored) to every outgoing
+  // request. Kept here, at the single shared Dio instance, rather than
+  // added manually to each repository call - this was left as an explicit
+  // placeholder in Phase 3 specifically so it landed here, once
+  // TokenStorageService existed to read from.
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = await ref.read(tokenStorageServiceProvider).readToken();
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        handler.next(options);
+      },
+    ),
+  );
 
   return dio;
 });

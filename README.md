@@ -70,6 +70,7 @@ Each should return `{"service": "<name>", "status": "ok"}`.
 
 # 🚀 Project Status
 
+<<<<<<< HEAD
 | Phase | Status |
 |-------|--------|
 | Phase 1 – System Architecture & Backend Connectivity | ✅ Completed |
@@ -80,6 +81,13 @@ Each should return `{"service": "<name>", "status": "ok"}`.
 | Phase 6 – Translation | ⏳ Planned |
 | Phase 7 – Text-to-Speech | ⏳ Planned |
 | Phase 8 – Real-Time Calling | ⏳ Planned |
+=======
+This project is being built in phases. Completed: **Phase 1 - System
+Architecture and Project Setup**, **Phase 2 - Flutter Application (Project
+Skeleton)**, **Phase 3 - FastAPI Backend (api_gateway Application Layer)**,
+**Phase 4 - Authentication**. See `docs/phase-notes/` for what's been built
+so far and what's next.
+>>>>>>> 96465c3 (Complete Phases 1-4: Infrastructure and Authentication)
 
 ## Tech Stack
 
