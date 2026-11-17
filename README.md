@@ -4,6 +4,9 @@ A real-time voice interpreter that lets two people who speak different languages
 
 **Languages:** English · Telugu (తెలుగు) · Tamil (தமிழ்) · Hindi (हिन्दी), in any combination.
 
+🔗 **Live demo:** https://YOUR-LINK.onrender.com
+*(Hosted on Render's free tier. If it has been idle, the first load takes about a minute to wake up.)*
+
 ---
 
 ## 📌 Problem
@@ -19,7 +22,7 @@ Two people open the app on their phones or laptops, join the same session and ch
 3. The translation is converted to speech and played on the other person's device.
 4. Both screens show the original sentence and its translation.
 
-It works even when the two people are in **different locations**.
+The app is deployed in the cloud, so the two people can be in **different locations** and only need internet.
 
 ---
 
@@ -28,7 +31,7 @@ It works even when the two people are in **different locations**.
 - 🔁 **Two-way voice translation** between English, Telugu, Tamil and Hindi
 - 📝 **Live transcripts** that appear while the person is speaking
 - 🔊 **Natural voices** for the translated speech
-- 🌍 **Remote conversations:** both devices only need internet
+- 🌍 **Remote conversations:** works from anywhere through the live link
 - 🔄 **Change language during a call**
 - 🛡️ **Echo / feedback-loop prevention:** mics pause while a translation is playing
 - ⏹️ **Interrupt button** to stop playback instantly
@@ -42,7 +45,7 @@ It works even when the two people are in **different locations**.
 
 ```mermaid
 flowchart LR
-    A["🎤 Speaker's device<br/>Speech recognition"] -- text --> B["FastAPI server<br/>(WebSocket)"]
+    A["🎤 Speaker's device<br/>Speech recognition"] -- text --> B["FastAPI server on Render<br/>(WebSocket)"]
     B --> C["Translation"]
     C --> D["Text-to-speech"]
     D -- audio --> E["🔊 Listener's device<br/>Playback"]
@@ -55,6 +58,7 @@ flowchart LR
 | Translation | Google Translate, with MyMemory as backup |
 | Text → Speech | Edge TTS neural voices, with Google voice as backup |
 | Audio playback | Web Audio API with an ordered playback queue |
+| Hosting | Render (cloud), auto-deployed from GitHub |
 
 All services used are **free and need no API keys**.
 
@@ -65,12 +69,20 @@ All services used are **free and need no API keys**.
 - **Backend:** Python, FastAPI, WebSockets, Uvicorn, asyncio
 - **Frontend:** HTML, CSS, JavaScript, Web Speech API, Web Audio API
 - **Speech & language:** Chrome Speech Recognition, Google Translate, MyMemory, Edge TTS
+- **Deployment:** Render (continuous deployment from GitHub)
 - **Testing:** Pytest, Playwright
-- **Networking:** HTTPS, Cloudflare Tunnel
 
 ---
 
-## 🚀 How to Run
+## 🚀 How to Use
+
+1. Open the **live demo link** in Google Chrome, on both devices.
+2. Enter the same **session code** on both.
+3. Choose your language under **"I speak"**.
+4. One person taps **Laptop**, the other taps **Phone**. These are just the two seats; either can be any device.
+5. Allow the microphone, tap the 🎤 mic and start talking. Pause briefly after each sentence.
+
+## 💻 Run Locally
 
 **Requirements:** Python 3.10+ and Google Chrome
 
@@ -79,20 +91,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-On Windows, you can double-click `start.bat` instead.
-
-**Connect from anywhere:**
-```bash
-cloudflared tunnel --url http://localhost:8000
-```
-Share the `https://….trycloudflare.com` link it prints.
-
-**Start a conversation:**
-1. Both people open the link in Chrome.
-2. Enter the same **session code**.
-3. Choose your language under **"I speak"**.
-4. One person taps **Laptop**, the other taps **Phone**.
-5. Tap the 🎤 mic and start talking.
+Then open `http://localhost:8000`.
 
 ---
 
@@ -111,6 +110,7 @@ server/
 static/           → Web interface (HTML, CSS, JS)
 tests/            → Automated tests
 run.py            → Starts the server
+render.yaml       → Render deployment config
 ```
 
 ---
@@ -129,12 +129,12 @@ python -m pytest
 ## ⚠️ Limitations
 
 - Conversation is **turn-based**: speak, pause, then the translation plays (about 1–3 seconds)
-- The computer running the server must stay on (not yet deployed to the cloud)
-- The free services can sometimes rate-limit; fallbacks reduce the impact
+- On the free hosting tier, the app **sleeps after 15 minutes idle** and takes about a minute to wake up
+- The free translation and voice services can sometimes rate-limit; fallbacks reduce the impact
+- Speech recognition needs **Google Chrome**
 
 ## 🔮 Future Scope
 
-- Cloud deployment with a permanent link
 - Mobile app with contacts and incoming-call notifications
 - Simultaneous (non-stop) interpretation
 - More Indian languages
