@@ -4,7 +4,7 @@ A real-time voice interpreter that lets two people who speak different languages
 
 **Languages:** English · Telugu (తెలుగు) · Tamil (தமிழ்) · Hindi (हिन्दी), in any combination.
 
-🔗 **Live demo:** https://YOUR-LINK.onrender.com
+🔗 🔗 **Live demo:** https://ai-phone-interpreter.onrender.com
 *(Hosted on Render's free tier. If it has been idle, the first load takes about a minute to wake up.)*
 
 ---
