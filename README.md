@@ -1,64 +1,78 @@
-# AI Phone Interpreter
+# 🌐 AI Phone Interpreter
 
-A real-time voice interpreter that lets two people who speak different languages talk to each other using two
-devices (phones or laptops), even from different places.
+A real-time voice interpreter that lets two people who speak different languages have a conversation using their own devices. One person speaks in their language, and the other hears it translated into theirs.
 
-Supported languages: **English, Telugu (తెలుగు), Tamil (தமிழ்) and Hindi (हिन्दी)**, in any pair.
+**Languages:** English · Telugu (తెలుగు) · Tamil (தமிழ்) · Hindi (हिन्दी), in any combination.
 
-## What it does
+---
 
-1. Each person opens the app in Chrome, enters the same session code and picks the language they speak.
-2. Person A speaks. Their words appear live on both screens.
-3. The sentence is translated into Person B's language.
-4. Person B's device speaks the translation aloud, and both screens show the original text and the translation.
-5. Person B replies, and the same happens in reverse.
+## 📌 Problem
 
-## Features
+In India, people often need to talk with someone who doesn't speak their language: at hospitals, offices, while travelling, or with family. Text translators are slow to use mid-conversation. This project makes it work like a normal conversation: **just speak, and the other person hears the translation.**
 
-- **Bidirectional voice translation** between any two of English, Telugu, Tamil and Hindi
-- **Live transcripts** that appear while the person is still speaking
-- **Spoken translations** with natural neural voices
-- **Change language mid-call** from Settings
-- **Works across locations:** both devices only need internet
-- **Feedback-loop prevention:** mics pause while a translation plays, so the app never re-translates its own voice
-- **Interrupt button:** stops playback on both devices and reopens the mics
-- **Automatic fallback:** if one translation or voice service fails, the next one takes over, so the conversation doesn't stop
-- **Latency shown per sentence:** translation time, voice time and time until the first audio plays
-- **Connection and device status:** online/offline, speaking, playing, network round-trip time
+## 💡 Solution
 
-## How it works
+Two people open the app on their phones or laptops, join the same session and choose their languages. When one person speaks:
+
+1. The speech is converted to text on their device.
+2. The text is translated into the other person's language.
+3. The translation is converted to speech and played on the other person's device.
+4. Both screens show the original sentence and its translation.
+
+It works even when the two people are in **different locations**.
+
+---
+
+## ✨ Features
+
+- 🔁 **Two-way voice translation** between English, Telugu, Tamil and Hindi
+- 📝 **Live transcripts** that appear while the person is speaking
+- 🔊 **Natural voices** for the translated speech
+- 🌍 **Remote conversations:** both devices only need internet
+- 🔄 **Change language during a call**
+- 🛡️ **Echo / feedback-loop prevention:** mics pause while a translation is playing
+- ⏹️ **Interrupt button** to stop playback instantly
+- ⚡ **Automatic fallback:** if one service fails, the next one takes over
+- ⏱️ **Latency shown for every sentence**
+- 📶 **Device status:** online/offline, speaking, playing
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
-    A["🎤 Speaker's browser<br/>Chrome speech recognition"] -- text (WebSocket) --> B["FastAPI server"]
-    B --> C["Loop guard"]
-    C --> D["Translation<br/>Google → MyMemory"]
-    D --> E["Sentence splitter"]
-    E --> F["Text-to-speech<br/>Edge TTS → Google voice"]
-    F -- audio (WebSocket) --> G["🔊 Listener's browser<br/>playback queue"]
+    A["🎤 Speaker's device<br/>Speech recognition"] -- text --> B["FastAPI server<br/>(WebSocket)"]
+    B --> C["Translation"]
+    C --> D["Text-to-speech"]
+    D -- audio --> E["🔊 Listener's device<br/>Playback"]
 ```
 
-| Stage | What is used |
+| Step | Technology |
 |---|---|
-| Speech → text | Chrome Web Speech API in each user's browser (`en-IN`, `te-IN`, `ta-IN`, `hi-IN`) |
-| Transport | WebSockets between the browsers and a FastAPI server |
-| Translation | Google Translate (free endpoint), with MyMemory as fallback |
-| Text → speech | Edge TTS neural voices (e.g. `te-IN-ShrutiNeural`), with the Google Translate voice and then the device's own voice as fallbacks |
-| Playback | Web Audio API with an ordered queue; the first sentence plays while the rest are still being generated |
+| Speech → Text | Chrome Web Speech API (runs in the browser) |
+| Real-time communication | WebSockets (FastAPI) |
+| Translation | Google Translate, with MyMemory as backup |
+| Text → Speech | Edge TTS neural voices, with Google voice as backup |
+| Audio playback | Web Audio API with an ordered playback queue |
 
-All of these services are **free and need no API keys**.
+All services used are **free and need no API keys**.
 
-## Tech stack
+---
+
+## 🛠️ Tech Stack
 
 - **Backend:** Python, FastAPI, WebSockets, Uvicorn, asyncio
-- **Frontend:** HTML, CSS, JavaScript, Web Speech API, Web Audio API, AudioWorklet
-- **Speech and language:** Chrome speech recognition, Google Translate, MyMemory, Edge TTS (`edge-tts`)
+- **Frontend:** HTML, CSS, JavaScript, Web Speech API, Web Audio API
+- **Speech & language:** Chrome Speech Recognition, Google Translate, MyMemory, Edge TTS
 - **Testing:** Pytest, Playwright
-- **Networking:** self-signed HTTPS for local devices, Cloudflare Tunnel for access from anywhere
+- **Networking:** HTTPS, Cloudflare Tunnel
 
-## Run it
+---
 
-Requires Python 3.10+ and Google Chrome.
+## 🚀 How to Run
+
+**Requirements:** Python 3.10+ and Google Chrome
 
 ```bash
 pip install -r requirements.txt
@@ -67,59 +81,60 @@ python run.py
 
 On Windows, you can double-click `start.bat` instead.
 
-- **Same Wi-Fi:** one device opens `http://localhost:8000`. The other opens the `https://<laptop-ip>:8443` address
-  printed by the server, or scans the QR code. Accept the certificate warning once.
-- **Different places:** run `cloudflared tunnel --url http://localhost:8000` and share the `https://…trycloudflare.com`
-  link it prints. The link works while the computer and the tunnel are running.
+**Connect from anywhere:**
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+Share the `https://….trycloudflare.com` link it prints.
 
-**To start a call**
-1. Both people open the link and enter the same session code.
-2. Each picks their language under **"I speak"**.
-3. One taps **Laptop**, the other taps **Phone**. These are just the two seats; either can be any device.
-4. Tap the mic and talk. Pause briefly after each sentence.
+**Start a conversation:**
+1. Both people open the link in Chrome.
+2. Enter the same **session code**.
+3. Choose your language under **"I speak"**.
+4. One person taps **Laptop**, the other taps **Phone**.
+5. Tap the 🎤 mic and start talking.
 
-## Project structure
+---
+
+## 📁 Project Structure
 
 ```
-run.py              starts the server
 server/
-  app.py            FastAPI app and WebSocket protocol
-  session.py        sessions: two seats, each with its own language and ordered work queue
-  pipeline.py       transcript → translation → sentences → speech → other device
-  translate.py      Google / MyMemory translators with fallback
-  tts.py            Edge TTS / Google voice / device voice with fallback
-  loopguard.py      feedback-loop prevention
-  sentences.py      sentence splitting (incl. Indic punctuation)
-  latency.py        per-stage timing, median and p90
-  vad.py            voice activity detection for server-side audio streaming
-  selftest.py       live checks of the external services
-static/             web UI (index.html, style.css, app.js, capture-worklet.js)
-scripts/            HTTPS certificate, live service probe, WebSocket and browser end-to-end tests
-tests/              pytest suite
+  app.py          → FastAPI app & WebSocket handling
+  session.py      → Session and device management
+  pipeline.py     → Speech → Translation → Voice pipeline
+  translate.py    → Translation services with fallback
+  tts.py          → Text-to-speech services with fallback
+  loopguard.py    → Echo / feedback-loop prevention
+  sentences.py    → Sentence splitting
+  latency.py      → Latency tracking
+static/           → Web interface (HTML, CSS, JS)
+tests/            → Automated tests
+run.py            → Starts the server
 ```
 
-## Testing
+---
+
+## ✅ Testing
 
 ```bash
-python -m pytest                    # 68 automated tests (no internet needed)
-python scripts/stage1_probe.py      # checks the real translation and voice services
-python scripts/e2e_browser.py       # two real Chrome browsers talking (needs Playwright)
+python -m pytest
 ```
 
-The tests cover the translation and voice providers (against a local mock of their APIs), voice activity
-detection, the loop guard, sentence splitting, latency stats and the full two-device WebSocket flow.
-The browser test runs two Chrome instances and checks both directions, playback, the loop guard,
-interrupt, and a Tamil ↔ Hindi conversation.
+- **68 automated tests** covering translation, text-to-speech, session handling, echo prevention and the full two-device WebSocket flow
+- **Browser end-to-end tests** with two Chrome instances talking to each other, including Tamil ↔ Hindi
 
-## Limitations
+---
 
-- Turn-based: speak, pause, then hear the translation, about 1–3 seconds later. Not simultaneous.
-- The computer running the server must stay on. It is not yet deployed to a permanent host.
-- The free translation and voice services are unofficial and can rate-limit. Fallbacks reduce the impact.
+## ⚠️ Limitations
 
-## Roadmap
+- Conversation is **turn-based**: speak, pause, then the translation plays (about 1–3 seconds)
+- The computer running the server must stay on (not yet deployed to the cloud)
+- The free services can sometimes rate-limit; fallbacks reduce the impact
 
-- Deploy to a cloud host for a permanent link
-- Installable mobile app (PWA) with accounts, contacts and incoming-call notifications
-- Simultaneous interpretation with streaming recognition
+## 🔮 Future Scope
+
+- Cloud deployment with a permanent link
+- Mobile app with contacts and incoming-call notifications
+- Simultaneous (non-stop) interpretation
 - More Indian languages
