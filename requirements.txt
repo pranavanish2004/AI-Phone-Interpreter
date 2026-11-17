@@ -1,0 +1,13 @@
+# Runtime (all already present in a standard Anaconda install)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+websockets>=12
+cryptography>=41        # self-signed HTTPS certificate for the phone
+edge-tts>=6.1           # free neural voices (same voices as Azure), no key needed
+
+# Tests
+pytest>=8
+httpx>=0.27             # used by FastAPI's TestClient
+
+# Optional, developer only: browser end-to-end test (scripts/e2e_browser.py)
+# playwright>=1.44

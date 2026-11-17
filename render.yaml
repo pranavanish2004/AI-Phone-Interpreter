@@ -1,0 +1,23 @@
+# Render.com deployment config (https://render.com).
+# In the Render dashboard: New -> Blueprint -> point at this repo -> it reads this file.
+# Or do it manually (New -> Web Service) using the same build/start commands below.
+#
+# Translation and voice work out of the box with no keys (Google free + MyMemory
+# translation, browser voices). Add AZURE_* / ELEVENLABS_* as extra env vars in the
+# Render dashboard (Environment tab) if/when those accounts work - never commit them here.
+services:
+  - type: web
+    name: ai-phone-interpreter
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py --cloud
+    envVars:
+      - key: PYTHONIOENCODING
+        value: utf-8
+      - key: TRANSLATE_PROVIDER
+        value: auto
+      - key: TTS_PROVIDER
+        value: auto
+      - key: STT_PROVIDER
+        value: auto

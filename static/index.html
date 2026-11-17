@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1720">
+  <title>Voice Interpreter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- ======================= JOIN SCREEN ======================= -->
+  <section id="join" class="screen">
+    <div class="join-card">
+      <div class="brand">
+        <span class="brand-mark">అ<span>A</span></span>
+        <div>
+          <h1>Voice Interpreter</h1>
+          <p class="muted">English · తెలుగు · தமிழ் · हिन्दी — real-time, two devices</p>
+        </div>
+      </div>
+
+      <div id="insecureBanner" class="banner warn hidden">
+        <strong>Microphone blocked on plain HTTP.</strong>
+        Open this page with <code>https://</code> (accept the certificate warning once), or on the laptop use
+        <code>http://localhost:8000</code>.
+      </div>
+
+      <label class="field">
+        <span>Session code</span>
+        <input id="sessionInput" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="e.g. 4821">
+      </label>
+
+      <label class="field">
+        <span>I speak</span>
+        <select id="langSelect">
+          <option value="en">English</option>
+          <option value="te">తెలుగు — Telugu</option>
+          <option value="ta">தமிழ் — Tamil</option>
+          <option value="hi">हिन्दी — Hindi</option>
+        </select>
+      </label>
+
+      <p class="muted small">Which seat? (one person takes each)</p>
+      <div class="role-pick">
+        <button class="role-btn" data-role="laptop">
+          <span class="role-icon">💻</span>
+          <span class="role-name">Laptop</span>
+          <span class="role-desc">seat 1 · usually the computer</span>
+        </button>
+        <button class="role-btn" data-role="phone">
+          <span class="role-icon">📱</span>
+          <span class="role-name">Phone</span>
+          <span class="role-desc">seat 2 · usually the phone</span>
+        </button>
+      </div>
+      <p class="muted small center" id="joinHint">Tip: join on the laptop first, then scan the QR code with the phone.</p>
+    </div>
+  </section>
+
+  <!-- ======================= CALL SCREEN ======================= -->
+  <section id="call" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="brand-mark small">అ<span>A</span></span>
+        <div class="session-info">
+          <span class="muted small">Session</span>
+          <strong id="sessionLabel">—</strong>
+        </div>
+      </div>
+      <div class="conn" id="connBadge"><span class="dot"></span><span id="connText">Connecting…</span></div>
+      <button id="settingsBtn" class="icon-btn" title="Settings">⚙</button>
+    </header>
+
+    <div class="devices">
+      <div class="device-card" id="dev-laptop">
+        <div class="device-head"><span class="role-icon">💻</span> Laptop <span class="lang-chip card-lang">—</span>
+          <span class="you-tag hidden">you</span></div>
+        <div class="device-status"><span class="dot"></span><span class="state">offline</span></div>
+        <div class="device-meta"><span class="mic">mic off</span> · <span class="rtt">– ms</span></div>
+      </div>
+      <div class="link-arrow">⇄</div>
+      <div class="device-card" id="dev-phone">
+        <div class="device-head"><span class="role-icon">📱</span> Phone <span class="lang-chip card-lang">—</span>
+          <span class="you-tag hidden">you</span></div>
+        <div class="device-status"><span class="dot"></span><span class="state">offline</span></div>
+        <div class="device-meta"><span class="mic">mic off</span> · <span class="rtt">– ms</span></div>
+      </div>
+    </div>
+
+    <div id="pairPanel" class="pair-panel hidden">
+      <div id="qr" class="qr"></div>
+      <div class="pair-text">
+        <strong>Connect the phone</strong>
+        <p class="muted small">Same Wi-Fi as this laptop. Scan, or type this address in Chrome on the phone:</p>
+        <div id="phoneUrls" class="urls"></div>
+        <p class="muted small">First time: Chrome shows “Your connection is not private” → <em>Advanced</em> →
+          <em>Proceed</em>. That is expected for this self-signed local certificate.</p>
+      </div>
+    </div>
+
+    <div id="notices"></div>
+
+    <main class="conversation" id="conversation">
+      <div class="empty" id="emptyState">
+        <p><strong>Tap the microphone and start talking.</strong></p>
+        <p class="muted small">Your words appear here with the translation underneath. The other device plays the
+          translated voice.</p>
+      </div>
+    </main>
+
+    <div class="latency-strip" id="latencyStrip">
+      <div><span class="muted">STT</span> <b id="latStt">–</b></div>
+      <div><span class="muted">Translate</span> <b id="latMt">–</b></div>
+      <div><span class="muted">Voice</span> <b id="latTts">–</b></div>
+      <div><span class="muted">First audio</span> <b id="latFirst">–</b></div>
+      <div class="hide-sm"><span class="muted">Median 📱→💻</span> <b id="latMedP2L">–</b></div>
+      <div class="hide-sm"><span class="muted">Median 💻→📱</span> <b id="latMedL2P">–</b></div>
+    </div>
+
+    <footer class="controls">
+      <div class="play-status" id="playStatus"><span class="eq"><i></i><i></i><i></i></span><span id="playText">Ready</span></div>
+      <button id="micBtn" class="mic-btn" aria-pressed="false">
+        <span class="mic-ring" id="micRing"></span>
+        <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12z"/></svg>
+      </button>
+      <div class="ctrl-right">
+        <div class="mic-label" id="micLabel">Tap to talk</div>
+        <button id="interruptBtn" class="ghost-btn" title="Stop playback and listen now">■ Stop audio</button>
+      </div>
+    </footer>
+
+    <!-- settings drawer -->
+    <aside id="drawer" class="drawer hidden">
+      <div class="drawer-inner">
+        <div class="drawer-head"><h2>Settings</h2><button id="closeDrawer" class="icon-btn">✕</button></div>
+
+        <h3>Speech recognition</h3>
+        <div class="seg" id="modeSeg">
+          <button data-mode="browser">Browser (free)</button>
+          <button data-mode="server">Azure (server)</button>
+        </div>
+        <p class="muted small" id="modeHelp"></p>
+
+        <h3>My language</h3>
+        <select id="langSelectCall" class="lang-select-call">
+          <option value="en">English</option>
+          <option value="te">తెలుగు — Telugu</option>
+          <option value="ta">தமிழ் — Tamil</option>
+          <option value="hi">हिन्दी — Hindi</option>
+        </select>
+
+        <h3>Voices</h3>
+        <p class="muted small" id="voiceInfo">–</p>
+        <button id="testVoiceBtn" class="ghost-btn">▶ Test my speaker</button>
+
+        <h3>Providers</h3>
+        <p class="muted small" id="providerInfo">–</p>
+        <button id="selftestBtn" class="ghost-btn">Run live provider check</button>
+        <pre id="selftestOut" class="selftest hidden"></pre>
+
+        <h3>Session</h3>
+        <button id="leaveBtn" class="ghost-btn danger">Leave session</button>
+      </div>
+    </aside>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
