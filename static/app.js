@@ -348,7 +348,7 @@
     hideEmpty();
     const b = el('div', `bubble from-${role} ${role === S.role ? 'mine' : 'theirs'}`);
     const who = el('div', 'who');
-    who.append(el('span', null, (role === 'laptop' ? '💻 Laptop' : '📱 Phone') + (role === S.role ? ' (you)' : '')));
+    who.append(el('span', null, (role === 'laptop' ? 'Person 1' : 'Person 2') + (role === S.role ? ' (you)' : '')));
     b.append(who);
     const orig = el('div', 'orig'); b.append(orig);
     const trans = el('div', 'trans'); trans.append(el('span', 'pending', 'translating…')); b.append(trans);
@@ -577,7 +577,7 @@
     const ips = (cfg && cfg.lan_ips) || [];
     for (const ip of ips) urls.push(`https://${ip}:${cfg.https_port}/?session=${S.session}&role=phone`);
     const box = $('#phoneUrls'); box.textContent = '';
-    if (!urls.length) box.append(el('span', 'muted', 'No network address found — is the laptop on Wi-Fi?'));
+    if (!urls.length) box.append(el('span', 'muted', 'No shareable address found — is this computer online?'));
     for (const u of urls) { const a = el('a', null, u); a.href = u; a.target = '_blank'; box.append(a); }
     const qr = $('#qr'); qr.textContent = '';
     if (urls.length && window.QRCode) new QRCode(qr, { text: urls[0], width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
@@ -612,8 +612,8 @@
   function wire() {
     if (!window.isSecureContext) $('#insecureBanner').classList.remove('hidden');
     const sess = params.get('session'); if (sess) $('#sessionInput').value = sess;
-    const suggested = isMobile ? 'phone' : 'laptop';  // overridden below by ?role=
-    document.querySelector(`.role-btn[data-role="${suggested}"]`).classList.add('suggested');
+    const suggested = isMobile ? 'phone' : 'laptop';  // only used to guess a default language
+    document.querySelector('.role-btn[data-role="laptop"]').classList.add('suggested');  // overridden below by ?role=
     document.querySelectorAll('.role-btn').forEach(b => b.addEventListener('click', () => join(b.dataset.role)));
 
     $('#micBtn').addEventListener('click', () => {
@@ -663,7 +663,7 @@
     });
     if (role === 'laptop' || role === 'phone') {
       document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('suggested', b.dataset.role === role));
-      $('#joinHint').textContent = `Tap “${role === 'phone' ? 'Phone' : 'Laptop'}” to join session ${sess || ''}.`;
+      $('#joinHint').textContent = `Tap “${role === 'phone' ? 'Person 2' : 'Person 1'}” to join session ${sess || ''}.`;
     }
     loadConfig();
   }

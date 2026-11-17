@@ -80,6 +80,11 @@ code { font-size: .9em; background: var(--panel-2); padding: 1px 5px; border-rad
 .role-btn.suggested { border-color: var(--en); box-shadow: 0 0 0 3px var(--en-soft); }
 .role-btn[data-role="phone"].suggested { border-color: var(--te); box-shadow: 0 0 0 3px var(--te-soft); }
 .role-icon { font-size: 22px; }
+.seat-badge {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--text); color: var(--bg); font: 700 15px var(--font);
+}
+.device-head .seat-badge { width: 20px; height: 20px; font-size: 12px; }
 .role-name { font-weight: 700; font-size: 17px; }
 .role-desc { font-size: 12.5px; color: var(--muted); }
 .lang-chip { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }

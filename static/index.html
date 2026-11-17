@@ -23,7 +23,7 @@
 
       <div id="insecureBanner" class="banner warn hidden">
         <strong>Microphone blocked on plain HTTP.</strong>
-        Open this page with <code>https://</code> (accept the certificate warning once), or on the laptop use
+        Open this page with <code>https://</code> (accept the certificate warning once), or on this computer use
         <code>http://localhost:8000</code>.
       </div>
 
@@ -42,20 +42,20 @@
         </select>
       </label>
 
-      <p class="muted small">Which seat? (one person takes each)</p>
+      <p class="muted small">Who are you? (one person each)</p>
       <div class="role-pick">
         <button class="role-btn" data-role="laptop">
-          <span class="role-icon">💻</span>
-          <span class="role-name">Laptop</span>
-          <span class="role-desc">seat 1 · usually the computer</span>
+          <span class="role-icon seat-badge">1</span>
+          <span class="role-name">Person 1</span>
+          <span class="role-desc">starts the call</span>
         </button>
         <button class="role-btn" data-role="phone">
-          <span class="role-icon">📱</span>
-          <span class="role-name">Phone</span>
-          <span class="role-desc">seat 2 · usually the phone</span>
+          <span class="role-icon seat-badge">2</span>
+          <span class="role-name">Person 2</span>
+          <span class="role-desc">joins the call</span>
         </button>
       </div>
-      <p class="muted small center" id="joinHint">Tip: join on the laptop first, then scan the QR code with the phone.</p>
+      <p class="muted small center" id="joinHint">Tip: Person 1 joins first and shares the link with Person 2.</p>
     </div>
   </section>
 
@@ -75,14 +75,14 @@
 
     <div class="devices">
       <div class="device-card" id="dev-laptop">
-        <div class="device-head"><span class="role-icon">💻</span> Laptop <span class="lang-chip card-lang">—</span>
+        <div class="device-head"><span class="role-icon seat-badge">1</span> Person 1 <span class="lang-chip card-lang">—</span>
           <span class="you-tag hidden">you</span></div>
         <div class="device-status"><span class="dot"></span><span class="state">offline</span></div>
         <div class="device-meta"><span class="mic">mic off</span> · <span class="rtt">– ms</span></div>
       </div>
       <div class="link-arrow">⇄</div>
       <div class="device-card" id="dev-phone">
-        <div class="device-head"><span class="role-icon">📱</span> Phone <span class="lang-chip card-lang">—</span>
+        <div class="device-head"><span class="role-icon seat-badge">2</span> Person 2 <span class="lang-chip card-lang">—</span>
           <span class="you-tag hidden">you</span></div>
         <div class="device-status"><span class="dot"></span><span class="state">offline</span></div>
         <div class="device-meta"><span class="mic">mic off</span> · <span class="rtt">– ms</span></div>
@@ -92,8 +92,8 @@
     <div id="pairPanel" class="pair-panel hidden">
       <div id="qr" class="qr"></div>
       <div class="pair-text">
-        <strong>Connect the phone</strong>
-        <p class="muted small">Same Wi-Fi as this laptop. Scan, or type this address in Chrome on the phone:</p>
+        <strong>Invite Person 2</strong>
+        <p class="muted small">Send this link (or let them scan the QR code). They open it in Chrome and tap “Person 2”:</p>
         <div id="phoneUrls" class="urls"></div>
         <p class="muted small">First time: Chrome shows “Your connection is not private” → <em>Advanced</em> →
           <em>Proceed</em>. That is expected for this self-signed local certificate.</p>
@@ -105,8 +105,8 @@
     <main class="conversation" id="conversation">
       <div class="empty" id="emptyState">
         <p><strong>Tap the microphone and start talking.</strong></p>
-        <p class="muted small">Your words appear here with the translation underneath. The other device plays the
-          translated voice.</p>
+        <p class="muted small">Your words appear here with the translation underneath. The other person hears the
+          translation spoken in their language.</p>
       </div>
     </main>
 
@@ -115,8 +115,8 @@
       <div><span class="muted">Translate</span> <b id="latMt">–</b></div>
       <div><span class="muted">Voice</span> <b id="latTts">–</b></div>
       <div><span class="muted">First audio</span> <b id="latFirst">–</b></div>
-      <div class="hide-sm"><span class="muted">Median 📱→💻</span> <b id="latMedP2L">–</b></div>
-      <div class="hide-sm"><span class="muted">Median 💻→📱</span> <b id="latMedL2P">–</b></div>
+      <div class="hide-sm"><span class="muted">Median 2→1</span> <b id="latMedP2L">–</b></div>
+      <div class="hide-sm"><span class="muted">Median 1→2</span> <b id="latMedL2P">–</b></div>
     </div>
 
     <footer class="controls">
